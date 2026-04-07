@@ -1,0 +1,43 @@
+services:
+  nextcloud-db:
+    image: mariadb:10.11
+    container_name: nextcloud-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "CHANGE_ME_ROOT_PW"
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: "CHANGE_ME_DB_PW"
+    volumes:
+      - ./db:/var/lib/mysql
+    networks:
+      - nextcloud-internal
+
+  nextcloud:
+    image: nextcloud:latest
+    container_name: nextcloud
+    restart: unless-stopped
+    depends_on:
+      - nextcloud-db
+    environment:
+      MYSQL_HOST: nextcloud-db
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: "CHANGE_ME_DB_PW"
+      NEXTCLOUD_TRUSTED_DOMAINS: "cloud.example.com"
+      OVERWRITEPROTOCOL: https
+      OVERWRITECLIURL: "https://cloud.example.com"
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./html:/var/www/html
+      - ./data:/var/www/html/data
+    networks:
+      - proxy
+      - nextcloud-internal
+
+networks:
+  proxy:
+    external: true
+  nextcloud-internal:
+    driver: bridge

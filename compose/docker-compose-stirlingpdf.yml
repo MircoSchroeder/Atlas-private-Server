@@ -1,0 +1,15 @@
+services:
+  stirlingpdf:
+    image: frooodle/s-pdf:latest
+    container_name: stirlingpdf
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8085:8080"
+    volumes:
+      - ./data:/usr/share/tessdata
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true

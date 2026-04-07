@@ -1,0 +1,13 @@
+services:
+  whoogle:
+    image: benbusby/whoogle-search:latest
+    container_name: whoogle
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5000:5000"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true

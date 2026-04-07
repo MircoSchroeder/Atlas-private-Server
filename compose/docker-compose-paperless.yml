@@ -1,0 +1,51 @@
+services:
+  paperless-db:
+    image: postgres:15
+    container_name: paperless-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD: "CHANGE_ME_DB_PW"
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    networks:
+      - paperless-internal
+
+  paperless-redis:
+    image: redis:7
+    container_name: paperless-redis
+    restart: unless-stopped
+    networks:
+      - paperless-internal
+
+  paperless:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    container_name: paperless
+    restart: unless-stopped
+    depends_on:
+      - paperless-db
+      - paperless-redis
+    environment:
+      PAPERLESS_DBHOST: paperless-db
+      PAPERLESS_DBPASS: "CHANGE_ME_DB_PW"
+      PAPERLESS_REDIS: redis://paperless-redis:6379
+      PAPERLESS_URL: "https://docs.example.com"
+      PAPERLESS_TIME_ZONE: "Europe/Zurich"
+      PAPERLESS_ADMIN_USER: admin
+      PAPERLESS_ADMIN_PASSWORD: "CHANGE_ME_ADMIN_PW"
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./data:/usr/src/paperless/data
+      - ./media:/usr/src/paperless/media
+      - ./consume:/usr/src/paperless/consume
+    networks:
+      - proxy
+      - paperless-internal
+
+networks:
+  proxy:
+    external: true
+  paperless-internal:
+    driver: bridge

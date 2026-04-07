@@ -1,0 +1,19 @@
+services:
+  heimdall:
+    image: linuxserver/heimdall:latest
+    container_name: heimdall
+    restart: unless-stopped
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: "Europe/Zurich"
+    ports:
+      - "127.0.0.1:8084:80"
+    volumes:
+      - ./config:/config
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
