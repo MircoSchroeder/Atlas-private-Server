@@ -1,0 +1,15 @@
+# Atlas Server — SSH Hardening Configuration
+# Place in: /etc/ssh/sshd_config.d/99-hardening.conf
+# Validate before applying: sshd -t
+# Apply: systemctl restart sshd
+
+Port 22222                          # Non-standard port, reduces bot noise
+PermitRootLogin no                  # Root cannot SSH in
+PasswordAuthentication no           # Key-based auth only
+PubkeyAuthentication yes            # Explicitly enabled
+MaxAuthTries 3                      # 3 failed attempts → connection dropped
+LoginGraceTime 30                   # 30 seconds to authenticate
+AllowUsers mirco                    # Only this user can SSH in
+X11Forwarding no                    # No GUI forwarding on a server
+ClientAliveInterval 300             # Keepalive ping every 5 minutes
+ClientAliveCountMax 2               # 2 missed pings → session terminated (10 min idle max)
